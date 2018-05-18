@@ -11,8 +11,8 @@ client.html 客户端（js采取原生的javascript，旨在降低阅读的复�
 
 客户端效果图
 
-![客户端效果图](screenshot/group_chat_pic1.png)
+![客户端效果图](group_chat/screenshot/group_chat_pic1.png)
 
 服务器端效果图
 
-![服务器端效果图](screenshot/group_chat_pic2.png)
+![服务器端效果图](group_chat/screenshot/group_chat_pic2.png)

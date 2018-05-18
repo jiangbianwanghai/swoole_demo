@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>群聊客户端</title>
+  <meta charset="UTF-8">
+  <script type="text/javascript">
+  var exampleSocket = new WebSocket("ws://192.168.1.110:9502");
+  exampleSocket.onopen = function (event) {
+    exampleSocket.send("哈罗，大家好！我来了");
+  };
+  exampleSocket.onmessage = function (event) {
+    console.log(event.data);
+    var panel = document.getElementById("panel");
+    panel.innerHTML = panel.innerHTML+event.data+"<br />";
+  }
+  </script>
+</head>
+<body>
+  <div id="panel"></div>
+<input type="text" id="content">
+<button onclick="exampleSocket.send( document.getElementById('content').value );document.getElementById('content').value='';">发送</button>
+</body>
+</html>

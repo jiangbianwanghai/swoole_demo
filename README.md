@@ -3,7 +3,8 @@
 
 ## 基于Swoole的聊天室
 
-###测试版
+### 新手入门版
+
 websocket.php socket服务器端
 client.html 客户端（js采取原生的javascript，旨在降低阅读的复杂度）
 

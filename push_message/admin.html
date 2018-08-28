@@ -26,7 +26,7 @@
         };
         socket.onopen = function () {  //监听是否连接服务器成功触发
             console.log('Connected!');
-            // socket.send(push_content['0'].value);    //重要!!客户端返回服务器
+            socket.send('服务端上线');    //重要!!客户端返回服务器
         };
 
         socket.onclose = function () {  //与服务器连接断开触发

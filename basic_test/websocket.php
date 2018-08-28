@@ -1,4 +1,8 @@
 <?php
+$redis = new Redis();
+$redis->connect('127.0.0.1', 6379);
+$redis->set("fd", "[]");
+
 /**
  * swoole从1.7.9开始增加了对WebSocket的支持
  */
@@ -11,9 +15,17 @@ $server = new swoole_websocket_server("0.0.0.0", 9502);
  * $req 是一个Http请求对象，包含了客户端发来的握手请求信息
  * onOpen事件函数中可以调用push向客户端发送数据或者调用close关闭连接
  */
-$server->on('open', function ($server, $req) {
+$server->on('open', function ($server, $req) use ($redis) {
     echo "connection open: {$req->fd}\n";
-    //$server->push($req->fd, 'hi,my friend.');
+    $str = json_decode($redis->get("fd"), true);
+    if ($str == "") {
+        $str = [];
+    }
+    if (!in_array($req->fd, $str)) {
+        array_push($str, $req->fd);
+        $str = json_encode($str);
+        $redis->set("fd", $str);
+    }
 });
 
 /**
@@ -29,21 +41,33 @@ $server->on('open', function ($server, $req) {
  * 4.$frame->finish， 表示数据帧是否完整，一个WebSocket请求可能会分成多个数据帧进行发送
  * PS:$data 如果是文本类型，编码格式必然是UTF-8，这是WebSocket协议规定的
  */
-$server->on('message', function ($server, $frame) {
-    echo "received message: {$frame->data}\n";
-    //echo authcode($frame->data, 'D');
+$server->on('message', function ($server, $frame) use ($redis) {
     /**
      * 向websocket客户端连接推送数据，长度最大不得超过2M。
      * $fd 客户端连接的ID，如果指定的$fd对应的TCP连接并非websocket客户端，将会发送失败
      * $data 要发送的数据内容
      * $opcode，指定发送数据内容的格式，默认为文本。发送二进制内容$opcode参数需要设置为WEBSOCKET_OPCODE_BINARY_FRAME
      */
-    $server->push($frame->fd, json_encode(["hello", "world"]));
+    echo "received message: {$frame->data}\n";
+    $server->push($frame->fd, $frame->data);
+    $str = json_decode($redis->get("fd"), true);
+    foreach ($str as $key => $value) {
+        // print_r($value);
+        if ($frame->fd != $value) {
+            print_r($value);
+            $server->push($value, "客户{$value}:" . $frame->data);
+        }
+    }
 });
 
 //设置关闭事件
-$server->on('close', function ($server, $fd) {
+$server->on('close', function ($server, $fd) use ($redis) {
     echo "connection close: {$fd}\n";
+    $str   = json_decode($redis->get("fd"), true);
+    $point = array_keys($str, $fd, true); //search key
+    array_splice($str, $point['0'], 1); //delete array
+    $str = json_encode($str);
+    $redis->set("fd", $str);
 });
 
 //服务开启

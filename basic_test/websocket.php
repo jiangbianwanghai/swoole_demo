@@ -50,12 +50,14 @@ $server->on('message', function ($server, $frame) use ($redis) {
      */
     $content = strip_tags($frame->data);
     echo "received message: {$frame->data}\n";
-    $server->push($frame->fd, $content);
-    $str = json_decode($redis->get("fd"), true);
-    foreach ($str as $key => $value) {
-        if ($frame->fd != $value) {
-            echo "客户{$value}:" . $content . "\n";
-            $server->push($value, "客户{$frame->fd}:" . $content);
+    if (!empty($content)) {
+        $server->push($frame->fd, $content);
+        $str = json_decode($redis->get("fd"), true);
+        foreach ($str as $key => $value) {
+            if ($frame->fd != $value) {
+                echo "客户{$value}:" . $content . "\n";
+                $server->push($value, "客户{$frame->fd}:" . $content);
+            }
         }
     }
 });

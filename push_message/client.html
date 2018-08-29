@@ -12,7 +12,7 @@
 </div>
 </body>
 <script>
-    var socket = new WebSocket('ws://192.168.1.110:9502');  //监听端口
+    var socket = new WebSocket('ws://192.168.8.234:9502');  //监听端口
     socket.onopen = function () {  //监听是否连接服务器成功触发
         console.log('Connected!');
         socket.send("这条信息会返回给服务器看");    //重要!!客户端返回服务器
@@ -20,7 +20,8 @@
     socket.onmessage = function (event) {  // **接收到服务器数据**触发
         console.log(event);
 //        alert('Received data: ' + event.data);
-        document.getElementById("push_content").innerHTML = event.data;
+      var html = document.getElementById("push_content").innerHTML;
+        document.getElementById("push_content").innerHTML = html + event.data;
 //        socket.close();
     };
     socket.onclose = function () {  //与服务器连接断开触发

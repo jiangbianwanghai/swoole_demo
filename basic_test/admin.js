@@ -1,5 +1,5 @@
 //监听端口
-var socket = new WebSocket('ws://192.168.1.110:9502');
+var socket = new WebSocket('ws://192.168.8.234:9502');
 
 //监听是否连接服务器成功触发
 socket.onopen = function () {

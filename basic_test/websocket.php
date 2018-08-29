@@ -48,14 +48,14 @@ $server->on('message', function ($server, $frame) use ($redis) {
      * $data 要发送的数据内容
      * $opcode，指定发送数据内容的格式，默认为文本。发送二进制内容$opcode参数需要设置为WEBSOCKET_OPCODE_BINARY_FRAME
      */
+    $content = strip_tags($frame->data);
     echo "received message: {$frame->data}\n";
-    $server->push($frame->fd, $frame->data);
+    $server->push($frame->fd, $content);
     $str = json_decode($redis->get("fd"), true);
     foreach ($str as $key => $value) {
-        // print_r($value);
         if ($frame->fd != $value) {
-            print_r($value);
-            $server->push($value, "客户{$value}:" . $frame->data);
+            echo "客户{$value}:" . $content . "\n";
+            $server->push($value, "客户{$frame->fd}:" . $content);
         }
     }
 });
